@@ -1,10 +1,12 @@
 import { Search } from 'lucide-react';
 import Link from 'next/link';
+import { Suspense } from 'react';
 
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { UserMenu } from '@/features/auth/components/UserMenu';
+import { SearchBar, SearchBarFallback } from '@/features/search/components/SearchBar';
 
 import { Brand } from './Brand';
-import { HeaderSearch } from './HeaderSearch';
 import { MobileNav } from './MobileNav';
 
 export function Header() {
@@ -14,7 +16,10 @@ export function Header() {
         <MobileNav />
         <Brand className="mr-2 md:hidden" />
         <div className="hidden flex-1 sm:flex">
-          <HeaderSearch />
+          {/* The search bar reads the URL. Suspense keeps the rest of the page prerenderable. */}
+          <Suspense fallback={<SearchBarFallback />}>
+            <SearchBar shortcut />
+          </Suspense>
         </div>
         <div className="ml-auto flex items-center gap-1">
           <Link
@@ -25,14 +30,7 @@ export function Header() {
             <Search aria-hidden="true" className="size-5" />
           </Link>
           <ThemeToggle />
-          {/* Account menu with sign-in arrives in the auth task. */}
-          <Link
-            href="/profile"
-            aria-label="Your profile"
-            className="border-line-strong bg-surface font-display text-ink hover:border-accent ml-1 inline-flex size-9 items-center justify-center rounded-full border text-sm font-semibold italic transition-colors"
-          >
-            G
-          </Link>
+          <UserMenu />
         </div>
       </div>
     </header>

@@ -4,11 +4,6 @@ import { Providers } from '@/app/providers';
 
 import { AppShell } from './AppShell';
 
-jest.mock('next/navigation', () => ({
-  usePathname: () => '/',
-  useRouter: () => ({ push: jest.fn(), replace: jest.fn(), prefetch: jest.fn() }),
-}));
-
 describe('AppShell', () => {
   beforeEach(() => {
     render(

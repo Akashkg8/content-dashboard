@@ -1,9 +1,8 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { MobileNav } from './MobileNav';
-
-jest.mock('next/navigation', () => ({ usePathname: () => '/' }));
+import { renderWithStore as render } from '../../../tests/utils/renderWithStore';
 
 /**
  * The dialog stays in the DOM but is hidden until opened. Name computation is
