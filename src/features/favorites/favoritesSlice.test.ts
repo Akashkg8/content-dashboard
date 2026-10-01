@@ -1,6 +1,5 @@
 import { makeStore } from '@/store';
 
-
 import { reorderFavorites, toggleFavorite } from './favoritesSlice';
 import {
   selectFavoriteCount,
