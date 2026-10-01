@@ -1,0 +1,51 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
+import { isActivePath, NAV_ITEMS } from '@/lib/navigation';
+import { cn } from '@/lib/utils';
+
+export interface NavLinksProps {
+  /** Called after a link is chosen. The mobile drawer uses it to close itself. */
+  onNavigate?: () => void;
+}
+
+export function NavLinks({ onNavigate }: NavLinksProps) {
+  const pathname = usePathname();
+  return (
+    <ul className="flex flex-col gap-1">
+      {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+        const active = isActivePath(pathname, href);
+        return (
+          <li key={href}>
+            <Link
+              href={href}
+              onClick={onNavigate}
+              aria-current={active ? 'page' : undefined}
+              className={cn(
+                'group relative flex items-center gap-3 rounded-lg px-3 py-2.5 font-medium transition-colors',
+                active
+                  ? 'bg-surface text-ink shadow-card'
+                  : 'text-ink-muted hover:bg-surface/60 hover:text-ink',
+              )}
+            >
+              <span
+                aria-hidden="true"
+                className={cn(
+                  'bg-accent absolute top-2 bottom-2 left-0 w-0.5 rounded-full transition-opacity',
+                  active ? 'opacity-100' : 'opacity-0',
+                )}
+              />
+              <Icon
+                aria-hidden="true"
+                className={cn('size-[1.125rem]', active ? 'text-accent' : 'text-current')}
+              />
+              {label}
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
