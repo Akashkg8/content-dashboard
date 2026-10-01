@@ -7,49 +7,49 @@ Status: DRAFT, awaiting approval. No code written yet.
 Source: "SDE Intern - Frontend Development Assignment" (48 hours, public GitHub repo,
 README, demo video, live link).
 
-| Spec | Requirement | Covered by |
-|---|---|---|
-| 1 | Preferences in a settings panel, persisted | Settings page + preferences slice + localStorage |
-| 1 | News by preferred categories | `/api/news` -> NewsAPI |
-| 1 | Recommendations from history or preferences | `/api/movies` -> TMDB discover, genres from preferences plus favorited movies |
-| 1 | Social posts by hashtag or profile (mock ok) | `/api/social?hashtag=&user=` mock API |
-| 1 | Cards: image, headline, description, CTA ("Read More", "Play Now") | `ContentCard` |
-| 1 | Infinite scroll or pagination | RTK Query infinite query + IntersectionObserver, "Load more" button fallback |
-| 2 | Responsive layout: sidebar, header with search, user settings, account info | `AppShell`, `Header` with `UserMenu` |
-| 2 | **One unified feed** of news, recommendations, social | Interleaved feed, filter chips by source |
-| 2 | Trending by category | `/trending` with category tabs |
-| 2 | Favorites section | `/favorites` |
-| 3 | Search across categories, debounced | `/search?q=` + `useDebounce` |
-| 4 | Drag-and-drop reorder of feed cards | dnd-kit sortable (see flag 1) |
-| 4 | Dark mode via CSS custom properties + Tailwind | Tokens in `globals.css`, next-themes |
-| 4 | Section transitions, loading spinners, card hover | `motion` page transitions, Spinner, hover lift |
-| 5 | Redux Toolkit for preferences and content data | Slices + RTK Query cache |
-| 5 | Thunks or RTK Query | RTK Query |
-| 5 | Persist preferences and dark mode | listener middleware; next-themes writes theme to localStorage |
-| 6 | Unit, integration (empty, error states), E2E (search, drag and drop, auth) | Jest + RTL + MSW, Playwright |
-| 7 | Bonus: auth with profile customization | Mock auth + profile page |
-| 7 | Bonus: real-time feed via SSE | `/api/stream` + RTK Query `onCacheEntryAdded` |
-| 7 | Bonus: i18n with react-i18next | Stretch only (see flag 6) |
-| Eval | Security of API keys | Keys server-only in route handlers |
-| Eval | WCAG accessibility | Keyboard drag and drop, focus management, AA contrast |
+| Spec | Requirement                                                                 | Covered by                                                                    |
+| ---- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| 1    | Preferences in a settings panel, persisted                                  | Settings page + preferences slice + localStorage                              |
+| 1    | News by preferred categories                                                | `/api/news` -> NewsAPI                                                        |
+| 1    | Recommendations from history or preferences                                 | `/api/movies` -> TMDB discover, genres from preferences plus favorited movies |
+| 1    | Social posts by hashtag or profile (mock ok)                                | `/api/social?hashtag=&user=` mock API                                         |
+| 1    | Cards: image, headline, description, CTA ("Read More", "Play Now")          | `ContentCard`                                                                 |
+| 1    | Infinite scroll or pagination                                               | RTK Query infinite query + IntersectionObserver, "Load more" button fallback  |
+| 2    | Responsive layout: sidebar, header with search, user settings, account info | `AppShell`, `Header` with `UserMenu`                                          |
+| 2    | **One unified feed** of news, recommendations, social                       | Interleaved feed, filter chips by source                                      |
+| 2    | Trending by category                                                        | `/trending` with category tabs                                                |
+| 2    | Favorites section                                                           | `/favorites`                                                                  |
+| 3    | Search across categories, debounced                                         | `/search?q=` + `useDebounce`                                                  |
+| 4    | Drag-and-drop reorder of feed cards                                         | dnd-kit sortable (see flag 1)                                                 |
+| 4    | Dark mode via CSS custom properties + Tailwind                              | Tokens in `globals.css`, next-themes                                          |
+| 4    | Section transitions, loading spinners, card hover                           | `motion` page transitions, Spinner, hover lift                                |
+| 5    | Redux Toolkit for preferences and content data                              | Slices + RTK Query cache                                                      |
+| 5    | Thunks or RTK Query                                                         | RTK Query                                                                     |
+| 5    | Persist preferences and dark mode                                           | listener middleware; next-themes writes theme to localStorage                 |
+| 6    | Unit, integration (empty, error states), E2E (search, drag and drop, auth)  | Jest + RTL + MSW, Playwright                                                  |
+| 7    | Bonus: auth with profile customization                                      | Mock auth + profile page                                                      |
+| 7    | Bonus: real-time feed via SSE                                               | `/api/stream` + RTK Query `onCacheEntryAdded`                                 |
+| 7    | Bonus: i18n with react-i18next                                              | Stretch only (see flag 6)                                                     |
+| Eval | Security of API keys                                                        | Keys server-only in route handlers                                            |
+| Eval | WCAG accessibility                                                          | Keyboard drag and drop, focus management, AA contrast                         |
 
 ## 1. Stack
 
-| Concern | Choice | Why / tradeoff |
-|---|---|---|
-| Framework | Next.js 16 App Router, React 19 | Current standard. Route handlers give us a free BFF (backend-for-frontend). |
-| Language | TypeScript strict + `noUncheckedIndexedAccess` | Catches undefined array/record access. |
-| Styling | Tailwind CSS v4 | CSS-first config, no tailwind.config.js. |
-| State | Redux Toolkit 2 | Required by assignment. |
-| Server data | RTK Query | Caching, dedupe, loading/error states, infinite queries built in. Thunks would mean hand-writing all of that. |
-| Persistence | Listener middleware -> localStorage | ~20 lines. redux-persist is overkill and fights SSR hydration. |
-| Theme | next-themes | Prevents the dark-mode flash on load. Theme is NOT in Redux (see 4.3). |
-| Drag & drop | dnd-kit (core + sortable) | Keyboard + screen-reader support. react-beautiful-dnd is deprecated. |
-| Animation | motion (Framer Motion) | Layout animations pair well with reordering. Respects reduced motion. |
-| Unit/integration | Jest 30 + React Testing Library + MSW | Spec names Jest. MSW mocks the network, not our code. |
-| E2E | Playwright | Faster and more reliable than Cypress, multi-browser. |
-| Package manager | npm | Already installed on this machine. |
-| Hosting | Vercel + GitHub Actions CI | Zero-config Next.js. CI runs lint, typecheck, tests. |
+| Concern          | Choice                                         | Why / tradeoff                                                                                                |
+| ---------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Framework        | Next.js 16 App Router, React 19                | Current standard. Route handlers give us a free BFF (backend-for-frontend).                                   |
+| Language         | TypeScript strict + `noUncheckedIndexedAccess` | Catches undefined array/record access.                                                                        |
+| Styling          | Tailwind CSS v4                                | CSS-first config, no tailwind.config.js.                                                                      |
+| State            | Redux Toolkit 2                                | Required by assignment.                                                                                       |
+| Server data      | RTK Query                                      | Caching, dedupe, loading/error states, infinite queries built in. Thunks would mean hand-writing all of that. |
+| Persistence      | Listener middleware -> localStorage            | ~20 lines. redux-persist is overkill and fights SSR hydration.                                                |
+| Theme            | next-themes                                    | Prevents the dark-mode flash on load. Theme is NOT in Redux (see 4.3).                                        |
+| Drag & drop      | dnd-kit (core + sortable)                      | Keyboard + screen-reader support. react-beautiful-dnd is deprecated.                                          |
+| Animation        | motion (Framer Motion)                         | Layout animations pair well with reordering. Respects reduced motion.                                         |
+| Unit/integration | Jest 30 + React Testing Library + MSW          | Spec names Jest. MSW mocks the network, not our code.                                                         |
+| E2E              | Playwright                                     | Faster and more reliable than Cypress, multi-browser.                                                         |
+| Package manager  | npm                                            | Already installed on this machine.                                                                            |
+| Hosting          | Vercel + GitHub Actions CI                     | Zero-config Next.js. CI runs lint, typecheck, tests.                                                          |
 
 ## 2. Folder structure (feature-based)
 
@@ -101,6 +101,7 @@ content-dashboard/
 ```
 
 Rules:
+
 - `app/` imports from `features/` and `components/`, never the reverse.
 - Features never import from each other except through `store/` selectors.
 - Unit tests sit next to the file they test (`Foo.test.tsx`).
@@ -114,16 +115,16 @@ type ContentSource = 'news' | 'movie' | 'social';
 type Category = 'technology' | 'sports' | 'business' | 'entertainment' | 'health' | 'science';
 
 interface ContentItem {
-  id: string;            // `${source}:${providerId}`, stable for favorites and ordering
+  id: string; // `${source}:${providerId}`, stable for favorites and ordering
   source: ContentSource;
   title: string;
   description: string;
   imageUrl: string | null;
-  url: string;           // CTA target
+  url: string; // CTA target
   ctaLabel: 'Read more' | 'Watch trailer' | 'View post';
   category: Category;
-  publishedAt: string;   // ISO
-  popularity: number;    // drives Trending sort
+  publishedAt: string; // ISO
+  popularity: number; // drives Trending sort
 }
 ```
 
@@ -147,11 +148,11 @@ Component -> RTK Query hook -> /api/news?category=&q=&page=   (Next route handle
 
 ### 3.3 Providers
 
-| Feed | Provider | Endpoints | Key |
-|---|---|---|---|
-| News | NewsAPI.org | `/v2/top-headlines?category=`, `/v2/everything?q=` | `NEWS_API_KEY` |
-| Recommendations | TMDB | `/discover/movie?with_genres=`, `/trending/movie/week`, `/search/movie` | `TMDB_API_KEY` |
-| Social | Mock | Seeded JSON served by `/api/social?hashtag=&user=&page=`, filterable and paged like a real API | none |
+| Feed            | Provider    | Endpoints                                                                                      | Key            |
+| --------------- | ----------- | ---------------------------------------------------------------------------------------------- | -------------- |
+| News            | NewsAPI.org | `/v2/top-headlines?category=`, `/v2/everything?q=`                                             | `NEWS_API_KEY` |
+| Recommendations | TMDB        | `/discover/movie?with_genres=`, `/trending/movie/week`, `/search/movie`                        | `TMDB_API_KEY` |
+| Social          | Mock        | Seeded JSON served by `/api/social?hashtag=&user=&page=`, filterable and paged like a real API | none           |
 
 Recommendations use preference categories mapped to TMDB genre ids, boosted by
 the genres of movies the user has favorited. That satisfies "based on user history".
@@ -250,16 +251,16 @@ args -> RTK Query fetches only the combinations not already cached.
 
 ## 7. Routing plan
 
-| Route | Rendering | Content |
-|---|---|---|
-| `/` | Server shell + client feed | Personalized sections, drag and drop, infinite scroll |
-| `/trending` | Server shell + client grid | Top headlines + TMDB trending + top social, by popularity |
-| `/favorites` | Client (localStorage) | Saved items, drag and drop |
-| `/search?q=` | Client | Cross-source results |
-| `/settings` | Client | Category and source preferences, hashtags to follow |
-| `/profile` | Client | Mock account: name, avatar, bio (bonus) |
-| `/api/stream` | Route handler | SSE live posts (bonus) |
-| `/api/news`, `/api/movies`, `/api/social` | Route handlers | BFF |
+| Route                                     | Rendering                  | Content                                                   |
+| ----------------------------------------- | -------------------------- | --------------------------------------------------------- |
+| `/`                                       | Server shell + client feed | Personalized sections, drag and drop, infinite scroll     |
+| `/trending`                               | Server shell + client grid | Top headlines + TMDB trending + top social, by popularity |
+| `/favorites`                              | Client (localStorage)      | Saved items, drag and drop                                |
+| `/search?q=`                              | Client                     | Cross-source results                                      |
+| `/settings`                               | Client                     | Category and source preferences, hashtags to follow       |
+| `/profile`                                | Client                     | Mock account: name, avatar, bio (bonus)                   |
+| `/api/stream`                             | Route handler              | SSE live posts (bonus)                                    |
+| `/api/news`, `/api/movies`, `/api/social` | Route handlers             | BFF                                                       |
 
 Every route has `loading.tsx` skeletons and an `error.tsx` boundary with retry.
 
@@ -276,12 +277,12 @@ Every route has `loading.tsx` skeletons and an `error.tsx` boundary with retry.
 
 ## 9. Testing strategy
 
-| Layer | Tool | What | Examples |
-|---|---|---|---|
-| Unit | Jest | Pure logic | reducers, order-merge selector, adapters fed bad provider data, useDebounce |
-| Component | RTL | Behaviour, not markup | ContentCard CTA and favorite, ThemeToggle, SearchBar debounce |
-| Integration | RTL + MSW + real store | Feature through the network | feed loads, error then retry, mock fallback badge, search empty state |
-| E2E | Playwright | Real user journeys | search, drag-and-drop reorder (pointer and keyboard), sign in and profile, favorite persists after reload, dark mode persists, mobile drawer |
+| Layer       | Tool                   | What                        | Examples                                                                                                                                     |
+| ----------- | ---------------------- | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Unit        | Jest                   | Pure logic                  | reducers, order-merge selector, adapters fed bad provider data, useDebounce                                                                  |
+| Component   | RTL                    | Behaviour, not markup       | ContentCard CTA and favorite, ThemeToggle, SearchBar debounce                                                                                |
+| Integration | RTL + MSW + real store | Feature through the network | feed loads, error then retry, mock fallback badge, search empty state                                                                        |
+| E2E         | Playwright             | Real user journeys          | search, drag-and-drop reorder (pointer and keyboard), sign in and profile, favorite persists after reload, dark mode persists, mobile drawer |
 
 - MSW intercepts `/api/*`, so tests exercise RTK Query for real.
 - `renderWithStore(ui, { preloadedState })` helper for every component test.
@@ -292,11 +293,11 @@ Every route has `loading.tsx` skeletons and an `error.tsx` boundary with retry.
 
 ## 10. Environment variables
 
-| Name | Required | Purpose |
-|---|---|---|
-| `NEWS_API_KEY` | No | NewsAPI.org key. Missing means mock news. |
-| `TMDB_API_KEY` | No | TMDB v3 key. Missing means mock movies. |
-| `USE_MOCK_DATA` | No | `true` forces mocks everywhere (tests, demos). |
+| Name            | Required | Purpose                                        |
+| --------------- | -------- | ---------------------------------------------- |
+| `NEWS_API_KEY`  | No       | NewsAPI.org key. Missing means mock news.      |
+| `TMDB_API_KEY`  | No       | TMDB v3 key. Missing means mock movies.        |
+| `USE_MOCK_DATA` | No       | `true` forces mocks everywhere (tests, demos). |
 
 No `NEXT_PUBLIC_` keys. Nothing secret reaches the browser.
 
