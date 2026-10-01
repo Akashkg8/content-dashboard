@@ -50,7 +50,7 @@ export function adaptMovie(movie: TmdbMovie, fallbackCategory: Category): Conten
       ? `${movie.release_date}T00:00:00.000Z`
       : new Date(0).toISOString(),
     author:
-      [rating ? `${rating.toFixed(1)} / 10` : null, year].filter(Boolean).join(' · ') || 'TMDB',
+      [rating ? `Rated ${rating.toFixed(1)}` : null, year].filter(Boolean).join(' · ') || 'TMDB',
     popularity: Math.round(rating * 10),
     genreIds,
   };

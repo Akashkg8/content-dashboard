@@ -11,7 +11,6 @@ import { GET as getSocial } from './social/route';
 import { GET as getTrending } from './trending/route';
 import { server } from '../../../tests/msw/server';
 
-
 const request = (path: string) => new NextRequest(new URL(path, 'http://localhost'));
 const json = async <T>(response: Response) => (await response.json()) as T;
 

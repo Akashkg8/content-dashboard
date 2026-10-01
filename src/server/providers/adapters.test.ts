@@ -85,7 +85,7 @@ describe('TMDB adapter', () => {
       category: 'technology',
       imageUrl: 'https://image.tmdb.org/t/p/w780/b.jpg',
       url: 'https://www.themoviedb.org/movie/157336',
-      author: '8.4 / 10 · 2014',
+      author: 'Rated 8.4 · 2014',
       popularity: 84,
       ctaLabel: 'Play Now',
     });

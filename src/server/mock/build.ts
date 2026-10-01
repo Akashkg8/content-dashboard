@@ -59,7 +59,7 @@ export function buildMockMovies(): ContentItem[] {
       url: `https://www.themoviedb.org/search?query=${encodeURIComponent(title)}`,
       ctaLabel: 'Play Now',
       publishedAt: `${year}-01-01T00:00:00.000Z`,
-      author: `${rating.toFixed(1)} / 10 · ${year}`,
+      author: `Rated ${rating.toFixed(1)} · ${year}`,
       popularity: Math.round(rating * 10),
       genreIds: [...genres],
     };
