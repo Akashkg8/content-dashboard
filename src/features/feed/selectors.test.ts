@@ -4,8 +4,6 @@ import { feedReducer, reorderFeed } from './feedSlice';
 import { applyOrder, interleavePages } from './selectors';
 import { makeContentItem } from '../../../tests/fixtures/content';
 
-
-
 const page = (source: ContentSource, titles: string[]): FeedPage => ({
   items: titles.map((title) => makeContentItem({ source, title, id: `${source}:${title}` })),
   page: 1,

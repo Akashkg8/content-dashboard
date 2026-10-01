@@ -1,4 +1,4 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi, fetchBaseQuery, type BaseQueryFn } from '@reduxjs/toolkit/query/react';
 
 import { contentItemSchema } from '@/lib/schemas';
 import type {
@@ -32,6 +32,15 @@ export interface LiveFeedState {
 export const MAX_LIVE_POSTS = 6;
 export const STREAM_URL = '/api/stream';
 
+/**
+ * Requests go to our own route handlers. The base is resolved against the page
+ * origin: browsers accept relative URLs, but Node's `Request` (tests) does not.
+ */
+const apiBaseQuery: BaseQueryFn = (args, api, extraOptions) => {
+  const baseUrl = typeof window === 'undefined' ? '/api' : `${window.location.origin}/api`;
+  return fetchBaseQuery({ baseUrl })(args, api, extraOptions);
+};
+
 /** Shared paging rule: ask for the next page while the server says there is more. */
 const pagedOptions = {
   initialPageParam: 1,
@@ -46,7 +55,7 @@ const pagedOptions = {
  */
 export const contentApi = createApi({
   reducerPath: 'contentApi',
-  baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
+  baseQuery: apiBaseQuery,
   keepUnusedDataFor: 300,
   endpoints: (build) => ({
     newsFeed: build.infiniteQuery<FeedPage, NewsFeedArg, number>({

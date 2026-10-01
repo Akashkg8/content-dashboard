@@ -6,7 +6,7 @@ import { Provider } from 'react-redux';
 
 import { hydrated } from './actions';
 import { makeStore, type AppStore } from './index';
-import { loadState } from './persistence';
+import { loadState, saveState, selectPersisted } from './persistence';
 
 export function StoreProvider({ children, store }: { children: ReactNode; store?: AppStore }) {
   // Lazy state initializer: the store is created once per mount, never shared between requests.
@@ -15,8 +15,15 @@ export function StoreProvider({ children, store }: { children: ReactNode; store?
   useEffect(() => {
     // Load saved state after the first render so server and client HTML match.
     appStore.dispatch(hydrated(loadState()));
+    // Saves are debounced. Flush immediately if the tab is closed or hidden mid-debounce.
+    const flush = () => saveState(selectPersisted(appStore.getState()));
+    window.addEventListener('pagehide', flush);
     // Refetch on window focus and reconnect.
-    return setupListeners(appStore.dispatch);
+    const unsubscribe = setupListeners(appStore.dispatch);
+    return () => {
+      window.removeEventListener('pagehide', flush);
+      unsubscribe();
+    };
   }, [appStore]);
 
   return <Provider store={appStore}>{children}</Provider>;

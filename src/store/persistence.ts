@@ -78,6 +78,12 @@ export function loadState(storage: Storage | undefined = safeStorage()): Partial
   return result;
 }
 
+/** The slices that are written to localStorage. */
+export function selectPersisted(state: PersistedState): PersistedState {
+  const { preferences, favorites, feed, auth } = state;
+  return { preferences, favorites, feed, auth };
+}
+
 export function saveState(state: PersistedState, storage: Storage | undefined = safeStorage()) {
   try {
     storage?.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -122,8 +128,7 @@ export function createPersistenceMiddleware() {
     effect: async (_action, api) => {
       api.cancelActiveListeners();
       await api.delay(SAVE_DELAY_MS);
-      const { preferences, favorites, feed, auth } = api.getState() as PersistedState;
-      saveState({ preferences, favorites, feed, auth });
+      saveState(selectPersisted(api.getState() as PersistedState));
     },
   });
   return listener.middleware;

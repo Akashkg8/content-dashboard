@@ -2,7 +2,6 @@ import { signIn } from '@/features/auth/authSlice';
 import { toggleFavorite } from '@/features/favorites/favoritesSlice';
 import { toggleCategory } from '@/features/preferences/preferencesSlice';
 
-
 import { hydrated } from './actions';
 import { makeStore } from './index';
 import { loadState, SAVE_DELAY_MS, STORAGE_KEY } from './persistence';
