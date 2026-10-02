@@ -6,7 +6,7 @@ dragging, save favorites, search everything at once, and watch new posts arrive 
 
 Built with Next.js 16, React 19, TypeScript, Redux Toolkit with RTK Query, and Tailwind CSS v4.
 
-- **Live demo:** _add the Vercel link here after deploying_
+- **Live demo:** https://content-dashboard-three-omega.vercel.app
 - **Demo video:** _add the link here after recording_ (script in [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md))
 
 ## Features
@@ -162,7 +162,8 @@ tests/
 2. Import it on [Vercel](https://vercel.com/new). It detects Next.js, so no settings are needed.
 3. Add `TMDB_API_KEY` (and `NEWS_API_KEY` if you like) under Project, then Settings, then
    Environment Variables.
-4. Deploy, then put the live link at the top of this README.
+4. Deploy. Use the production address under Settings, then Domains: one-off deployment links
+   ask visitors to log in to Vercel.
 
 ## Known limitations
 
