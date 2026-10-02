@@ -101,12 +101,13 @@ export function SearchView({ query }: { query: string }) {
           message="We could not complete this search. Try again in a moment."
           onRetry={() => void refetch()}
         />
-      ) : !shown ? (
+      ) : !shown || (stale && total === 0) ? (
+        // Nothing useful to keep on screen while the new query loads.
         <div className="space-y-6">
           <Spinner label={`Searching for ${query}`} />
           <CardGridSkeleton count={3} />
         </div>
-      ) : total === 0 && !stale ? (
+      ) : total === 0 ? (
         <EmptyState
           icon={<SearchX className="size-6" />}
           title={`No results for “${query}”`}
@@ -126,7 +127,9 @@ export function SearchView({ query }: { query: string }) {
             <ContentGrid items={visible} label={`Search results for ${query}`} />
           ) : (
             <p className="text-ink-muted">
-              No {SOURCE_META[filter as ContentSource].plural.toLowerCase()} match this search.
+              {filter === 'all'
+                ? 'No results match this search.'
+                : `No ${SOURCE_META[filter].plural.toLowerCase()} match this search.`}
             </p>
           )}
         </div>
