@@ -1,6 +1,8 @@
 # Task Board (Phase 3)
 
-Status: DRAFT, awaiting approval. Effort is focused hours for you reviewing and running each step.
+Status: all build tasks are done, including the i18n stretch goal (B4). Still open, and only the
+owner can do them: P0 (create the public GitHub repo), P2 (Vercel deploy) and recording the demo video.
+The desktop sidebar collapse from the architecture plan was not built.
 Each task ends with lint, typecheck and tests green, plus one commit.
 
 Legend: P0 = must ship, P1 = should ship, P2 = bonus.

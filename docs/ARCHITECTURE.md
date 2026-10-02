@@ -1,6 +1,6 @@
 # Personalized Content Dashboard: Architecture (Phase 2)
 
-Status: DRAFT, awaiting approval. No code written yet.
+Status: implemented. Section 12 lists where the build differs from this plan.
 
 ## 0. Assignment requirements traceability
 
@@ -319,3 +319,23 @@ No `NEXT_PUBLIC_` keys. Nothing secret reaches the browser.
    Done last, only if time remains.
 7. **Submission needs things only you can do:** a public GitHub repo, a Vercel account, and the demo video recording.
    I'll provide the demo script.
+
+## 12. Changes made during implementation
+
+| Plan                                  | What was built                                      | Why                                                                                      |
+| ------------------------------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `src/lib/env.ts`                      | `src/server/env.ts`, guarded by `server-only`       | Importing it from client code now fails the build, so keys cannot leak.                  |
+| Fixture JSON in `src/services/mocks/` | Typed seed data in `src/server/mock/`               | Type-checked, and timestamps are generated relative to now so sample stories look fresh. |
+| `cva` for component variants          | Plain variant maps with `clsx` and `tailwind-merge` | Fewer dependencies for the handful of variants needed.                                   |
+| Search on three endpoints             | One `/api/search` route that queries all sources    | One request per search, one cache entry.                                                 |
+| Trending on existing endpoints        | A dedicated `/api/trending` route                   | Each source has its own notion of "popular".                                             |
+| i18n as a stretch goal                | English and Hindi, typed keys                       | Built. Content text stays in its original language.                                      |
+| Desktop sidebar collapse              | Not built                                           | Low value next to the other features.                                                    |
+
+Two implementation details worth knowing:
+
+- **Hydration.** Pages sit inside Suspense boundaries from `loading.tsx`, so they can hydrate after
+  the store has already loaded localStorage. The `useStoreHydrated` and `useT` hooks return the
+  server values during hydration and switch right after, which keeps server and client HTML equal.
+- **Live strip.** The "Just in" strip has a fixed height from the first render, so arriving posts
+  never shift the feed, even in the middle of a drag.
