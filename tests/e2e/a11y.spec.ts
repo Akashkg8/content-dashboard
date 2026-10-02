@@ -10,6 +10,8 @@ for (const theme of ['light', 'dark'] as const) {
 
     for (const path of PAGES) {
       test(`${path} has no WCAG A/AA violations`, async ({ page }) => {
+        // Without motion, nothing is mid-fade when contrast is measured.
+        await page.emulateMedia({ reducedMotion: 'reduce' });
         await page.goto(path);
         // Let data load and entrance animations finish so contrast is measured at rest.
         await page.waitForLoadState('networkidle');

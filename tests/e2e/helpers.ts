@@ -31,6 +31,8 @@ export async function waitForSave(page: Page, check: (saved: Record<string, unkn
  * press on the handle, move past the activation distance, then drop.
  */
 export async function dragTo(page: Page, handle: Locator, target: Locator) {
+  // Raw mouse events do not scroll, so both ends must be on screen first.
+  await handle.scrollIntoViewIfNeeded();
   const from = (await handle.boundingBox())!;
   const to = (await target.boundingBox())!;
   await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);

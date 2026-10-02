@@ -31,7 +31,9 @@ test.describe('Personalized feed', () => {
   test('receives live posts over the real-time stream', async ({ page }) => {
     await openFeed(page);
     await expect(page.getByText('Live', { exact: true })).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByRole('heading', { name: 'Just in' })).toBeVisible({ timeout: 15_000 });
+    const strip = page.getByRole('region', { name: 'Just in' });
+    await expect(strip.getByText('Listening for new posts…')).toBeHidden({ timeout: 15_000 });
+    await expect(strip.getByRole('link', { name: /^View Post:/ }).first()).toBeVisible();
   });
 
   test('applies settings to the feed', async ({ page }) => {

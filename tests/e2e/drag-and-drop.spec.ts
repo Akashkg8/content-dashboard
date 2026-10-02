@@ -42,9 +42,13 @@ test.describe('Drag and drop', () => {
       .getByRole('button', { name: /^Reorder:/ })
       .focus();
     await page.keyboard.press('Space');
-    // dnd-kit announces each step in a live region for screen readers.
-    await expect(page.getByText(/moved to position|Picked up/)).toBeAttached();
-    await page.keyboard.press('ArrowRight');
+    // dnd-kit announces each step in a live region. Like a screen-reader user,
+    // wait to hear where the card is before the next key.
+    await expect(page.getByText(/moved to position 1 of|Picked up/)).toBeAttached();
+    await expect(async () => {
+      await page.keyboard.press('ArrowRight');
+      await expect(page.getByText(/moved to position 2 of/)).toBeAttached({ timeout: 500 });
+    }).toPass({ timeout: 5_000 });
     await page.keyboard.press('Space');
 
     await expect.poll(() => cardTitles(page).then((t) => t[1])).toBe(before[0]);
