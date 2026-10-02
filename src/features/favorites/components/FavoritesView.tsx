@@ -8,6 +8,7 @@ import { SortableGrid } from '@/components/content/SortableGrid';
 import { buttonClasses } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { useT } from '@/i18n/useT';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { useStoreHydrated } from '@/store/useStoreHydrated';
 
@@ -16,18 +17,19 @@ import { selectFavoriteItems } from '../selectors';
 
 export function FavoritesView() {
   const dispatch = useAppDispatch();
+  const { t } = useT();
   const items = useAppSelector(selectFavoriteItems);
   const hydrated = useStoreHydrated();
 
   return (
     <>
       <PageHeader
-        kicker="Saved for later"
-        title="Favorites"
+        kicker={t('favorites.kicker')}
+        title={t('favorites.title')}
         description={
           hydrated && items.length
-            ? `${items.length} saved ${items.length === 1 ? 'item' : 'items'}. Drag the grip to put them in your own order.`
-            : 'Everything you save, in the order you like.'
+            ? t('favorites.count', { count: items.length })
+            : t('favorites.description')
         }
       />
       {!hydrated ? (
@@ -35,18 +37,18 @@ export function FavoritesView() {
       ) : items.length === 0 ? (
         <EmptyState
           icon={<Heart className="size-6" />}
-          title="Nothing saved yet"
-          description="Tap the heart on any story, movie or post to keep it here. Favorites are saved on this device."
+          title={t('favorites.emptyTitle')}
+          description={t('favorites.emptyDescription')}
           action={
             <Link href="/" className={buttonClasses()}>
-              Browse my feed
+              {t('favorites.browse')}
             </Link>
           }
         />
       ) : (
         <SortableGrid
           items={items}
-          label="Your favorites"
+          label={t('favorites.listLabel')}
           onReorder={(activeId, overId) => dispatch(reorderFavorites({ activeId, overId }))}
         />
       )}

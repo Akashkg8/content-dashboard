@@ -14,6 +14,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Spinner } from '@/components/ui/Spinner';
+import { useT } from '@/i18n/useT';
 import { useSearchQuery } from '@/services/contentApi';
 import type { ContentItem, ContentSource } from '@/types/content';
 
@@ -24,6 +25,7 @@ const SUGGESTIONS = ['space', 'Interstellar', '#cricket', '@frontendfox', 'marke
 type Filter = 'all' | ContentSource;
 
 export function SearchView({ query }: { query: string }) {
+  const { t, language } = useT();
   const [filter, setFilter] = useState<Filter>('all');
   // A new search starts on "All" again.
   const [filterQuery, setFilterQuery] = useState(query);
@@ -53,10 +55,10 @@ export function SearchView({ query }: { query: string }) {
   const visible = filter === 'all' ? all : bySource[filter];
 
   const options: ChipOption<Filter>[] = [
-    { value: 'all', label: 'All', count: total },
+    { value: 'all', label: t('search.all'), count: total },
     ...(['news', 'movie', 'social'] as const).map((source) => ({
       value: source,
-      label: SOURCE_META[source].plural,
+      label: t(SOURCE_META[source].pluralKey),
       count: bySource[source].length,
     })),
   ];
@@ -64,9 +66,9 @@ export function SearchView({ query }: { query: string }) {
   return (
     <>
       <PageHeader
-        kicker="Search"
-        title={ready ? `Results for “${query}”` : 'Search everything'}
-        description="One search across news, movies and posts. Try #hashtags and @handles for posts."
+        kicker={t('search.kicker')}
+        title={ready ? t('search.titleResults', { query }) : t('search.titleEmpty')}
+        description={t('search.description')}
         actions={shown ? <DataOriginBadge origins={[shown.origins]} /> : null}
       />
 
@@ -79,57 +81,59 @@ export function SearchView({ query }: { query: string }) {
 
       {/* Announce result counts to screen readers as the user types. */}
       <p role="status" aria-live="polite" className="sr-only">
-        {ready && currentData ? `${total} results for ${query}` : ''}
+        {ready && currentData ? t('search.resultsCount', { count: total, query }) : ''}
       </p>
 
       {!ready ? (
         <EmptyState
           icon={<Search className="size-6" />}
-          title="What are you looking for?"
+          title={t('search.promptTitle')}
           description={
             <>
-              Type at least {MIN_QUERY_LENGTH} characters in the search box, or press{' '}
-              <kbd className="border-line-strong rounded border px-1 font-mono text-xs">/</kbd> to
-              jump there. Some ideas:
+              {t('search.promptBefore', { min: MIN_QUERY_LENGTH })}{' '}
+              <kbd className="border-line-strong rounded border px-1 font-mono text-xs">/</kbd>{' '}
+              {t('search.promptAfter')}
             </>
           }
           action={<Suggestions />}
         />
       ) : isError ? (
         <ErrorState
-          title="Search is not responding"
-          message="We could not complete this search. Try again in a moment."
+          title={t('search.errorTitle')}
+          message={t('search.errorMessage')}
           onRetry={() => void refetch()}
         />
       ) : !shown || (stale && total === 0) ? (
         // Nothing useful to keep on screen while the new query loads.
         <div className="space-y-6">
-          <Spinner label={`Searching for ${query}`} />
+          <Spinner label={t('search.searching', { query })} />
           <CardGridSkeleton count={3} />
         </div>
       ) : total === 0 ? (
         <EmptyState
           icon={<SearchX className="size-6" />}
-          title={`No results for “${query}”`}
-          description="Check the spelling, use fewer words, or try one of these:"
+          title={t('search.noResultsTitle', { query })}
+          description={t('search.noResultsDescription')}
           action={<Suggestions />}
         />
       ) : (
         <div aria-busy={stale} className={stale ? 'opacity-60 transition-opacity' : undefined}>
           <ChipGroup
-            label="Filter results by source"
+            label={t('search.filterLabel')}
             options={options}
             value={filter}
             onChange={setFilter}
             className="mb-6"
           />
           {visible.length ? (
-            <ContentGrid items={visible} label={`Search results for ${query}`} />
+            <ContentGrid items={visible} label={t('search.listLabel', { query })} />
           ) : (
             <p className="text-ink-muted">
               {filter === 'all'
-                ? 'No results match this search.'
-                : `No ${SOURCE_META[filter].plural.toLowerCase()} match this search.`}
+                ? t('search.noneAll')
+                : t('search.noneSource', {
+                    source: t(SOURCE_META[filter].pluralKey).toLocaleLowerCase(language),
+                  })}
             </p>
           )}
         </div>

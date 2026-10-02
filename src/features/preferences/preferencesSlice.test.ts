@@ -51,7 +51,12 @@ describe('preferencesSlice', () => {
 
   it('resets and hydrates', () => {
     expect(reduce(toggleCategory('science'), resetPreferences())).toEqual(initialPreferences);
-    const saved = { categories: ['health' as const], sources: ['movie' as const], hashtags: [] };
+    const saved = {
+      categories: ['health' as const],
+      sources: ['movie' as const],
+      hashtags: [],
+      language: 'hi' as const,
+    };
     expect(reduce(hydrated({ preferences: saved }))).toEqual(saved);
     expect(reduce(hydrated({}))).toEqual(initialPreferences);
   });

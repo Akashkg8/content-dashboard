@@ -16,27 +16,34 @@ import type { Category, ContentSource } from '@/types/content';
 
 export const SOURCE_META: Record<
   ContentSource,
-  { label: string; plural: string; tone: BadgeTone; icon: LucideIcon; text: string; bg: string }
+  {
+    labelKey: `sources.${ContentSource}`;
+    pluralKey: `sources.${ContentSource}Plural`;
+    tone: BadgeTone;
+    icon: LucideIcon;
+    text: string;
+    bg: string;
+  }
 > = {
   news: {
-    label: 'News',
-    plural: 'News',
+    labelKey: 'sources.news',
+    pluralKey: 'sources.newsPlural',
     tone: 'news',
     icon: Newspaper,
     text: 'text-news',
     bg: 'bg-news',
   },
   movie: {
-    label: 'Movie',
-    plural: 'Movies',
+    labelKey: 'sources.movie',
+    pluralKey: 'sources.moviePlural',
     tone: 'movie',
     icon: Film,
     text: 'text-movie',
     bg: 'bg-movie',
   },
   social: {
-    label: 'Post',
-    plural: 'Posts',
+    labelKey: 'sources.social',
+    pluralKey: 'sources.socialPlural',
     tone: 'social',
     icon: MessageCircle,
     text: 'text-social',

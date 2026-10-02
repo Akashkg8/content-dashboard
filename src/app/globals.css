@@ -138,6 +138,11 @@
     border-radius: 4px;
   }
 
+  /* Letter-spacing breaks Devanagari conjuncts, and there is no uppercase to space out. */
+  :lang(hi) [class*='tracking-'] {
+    letter-spacing: normal;
+  }
+
   dialog::backdrop {
     background: rgb(12 11 9 / 0.55);
     backdrop-filter: blur(2px);

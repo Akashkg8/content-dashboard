@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { selectFavoriteCount } from '@/features/favorites/selectors';
+import { useT } from '@/i18n/useT';
 import { isActivePath, NAV_ITEMS } from '@/lib/navigation';
 import { cn } from '@/lib/utils';
 import { useAppSelector } from '@/store/hooks';
@@ -16,11 +17,12 @@ export interface NavLinksProps {
 
 export function NavLinks({ onNavigate }: NavLinksProps) {
   const pathname = usePathname();
+  const { t } = useT();
   const hydrated = useStoreHydrated();
   const favoriteCount = useAppSelector(selectFavoriteCount);
   return (
     <ul className="flex flex-col gap-1">
-      {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+      {NAV_ITEMS.map(({ href, labelKey, icon: Icon }) => {
         const active = isActivePath(pathname, href);
         return (
           <li key={href}>
@@ -46,11 +48,11 @@ export function NavLinks({ onNavigate }: NavLinksProps) {
                 aria-hidden="true"
                 className={cn('size-[1.125rem]', active ? 'text-accent' : 'text-current')}
               />
-              {label}
+              {t(labelKey)}
               {href === '/favorites' && hydrated && favoriteCount > 0 ? (
                 <span className="bg-accent text-on-accent ml-auto rounded-full px-2 py-0.5 font-mono text-[0.6875rem] font-medium">
                   {favoriteCount}
-                  <span className="sr-only"> saved</span>
+                  <span className="sr-only"> {t('nav.saved')}</span>
                 </span>
               ) : null}
             </Link>

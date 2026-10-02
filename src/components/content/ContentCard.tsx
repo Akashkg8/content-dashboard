@@ -6,9 +6,10 @@ import { useState, type ReactNode } from 'react';
 
 import { Badge } from '@/components/ui/Badge';
 import { FavoriteButton } from '@/features/favorites/components/FavoriteButton';
+import { useT } from '@/i18n/useT';
 import { timeAgo } from '@/lib/format';
 import { cn } from '@/lib/utils';
-import { CATEGORY_LABELS, type ContentItem } from '@/types/content';
+import type { ContentItem } from '@/types/content';
 
 import { SOURCE_META } from './sourceStyles';
 
@@ -26,6 +27,8 @@ export interface ContentCardProps {
 export function ContentCard({ item, rank, handle, priority, className }: ContentCardProps) {
   const meta = SOURCE_META[item.source];
   const isPost = item.source === 'social';
+  const { t, language } = useT();
+  const cta = t(`cta.${item.ctaLabel}`);
 
   return (
     <article
@@ -42,11 +45,11 @@ export function ContentCard({ item, rank, handle, priority, className }: Content
         <div className="flex items-center gap-2">
           <Badge tone={meta.tone} className="bg-surface/90 backdrop-blur">
             <meta.icon aria-hidden="true" className="size-3" />
-            {meta.label}
+            {t(meta.labelKey)}
           </Badge>
           {rank ? (
             <span className="bg-ink text-paper font-display rounded-full px-2.5 py-0.5 text-sm font-semibold italic">
-              No. {rank}
+              {t('trending.rank', { rank })}
             </span>
           ) : null}
         </div>
@@ -55,14 +58,14 @@ export function ContentCard({ item, rank, handle, priority, className }: Content
 
       <div className="flex flex-1 flex-col p-5">
         <p className="text-ink-muted flex flex-wrap items-center gap-x-2 font-mono text-[0.6875rem] tracking-wider uppercase">
-          <span className={meta.text}>{CATEGORY_LABELS[item.category]}</span>
+          <span className={meta.text}>{t(`categories.${item.category}`)}</span>
           <span aria-hidden="true">/</span>
           <span className="truncate normal-case">{item.author}</span>
           {item.source !== 'movie' ? (
             <>
               <span aria-hidden="true">/</span>
               <time dateTime={item.publishedAt} className="normal-case">
-                {timeAgo(item.publishedAt)}
+                {timeAgo(item.publishedAt, language)}
               </time>
             </>
           ) : null}
@@ -89,7 +92,7 @@ export function ContentCard({ item, rank, handle, priority, className }: Content
         </p>
 
         {item.hashtags?.length ? (
-          <ul aria-label="Hashtags" className="mt-3 flex flex-wrap gap-1.5">
+          <ul aria-label={t('common.hashtags')} className="mt-3 flex flex-wrap gap-1.5">
             {item.hashtags.map((tag) => (
               <li key={tag} className="text-social font-mono text-xs">
                 #{tag}
@@ -103,14 +106,14 @@ export function ContentCard({ item, rank, handle, priority, className }: Content
             href={item.url}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`${item.ctaLabel}: ${item.title} (opens in a new tab)`}
+            aria-label={`${cta}: ${item.title} ${t('common.opensNewTab')}`}
             className={cn(
               'inline-flex items-center gap-1.5 rounded-full text-sm font-semibold',
               'decoration-2 underline-offset-4 hover:underline',
               meta.text,
             )}
           >
-            {item.ctaLabel}
+            {cta}
             <ArrowUpRight
               aria-hidden="true"
               className="size-4 transition-transform group-hover/card:translate-x-0.5 group-hover/card:-translate-y-0.5"

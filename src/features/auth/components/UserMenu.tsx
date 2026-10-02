@@ -7,6 +7,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { IconButton } from '@/components/ui/IconButton';
 import { selectFavoriteCount } from '@/features/favorites/selectors';
+import { useT } from '@/i18n/useT';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { useStoreHydrated } from '@/store/useStoreHydrated';
 
@@ -24,8 +25,9 @@ export function UserMenu() {
   return user ? <AccountMenu /> : <SignInButton />;
 }
 
-export function SignInButton({ label = 'Sign in' }: { label?: string }) {
+export function SignInButton({ label }: { label?: string }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const { t } = useT();
   const close = () => dialogRef.current?.close();
 
   return (
@@ -38,7 +40,7 @@ export function SignInButton({ label = 'Sign in' }: { label?: string }) {
         onClick={() => dialogRef.current?.showModal()}
       >
         <LogIn aria-hidden="true" className="size-3.5" />
-        {label}
+        {label ?? t('auth.signIn')}
       </Button>
       <dialog
         ref={dialogRef}
@@ -52,11 +54,11 @@ export function SignInButton({ label = 'Sign in' }: { label?: string }) {
           <div className="mb-5 flex items-start justify-between">
             <div>
               <h2 id="sign-in-title" className="font-display text-2xl font-semibold">
-                Sign in to Dispatch
+                {t('auth.signInTitle')}
               </h2>
-              <p className="text-ink-muted mt-1 text-sm">Personalize your profile and greeting.</p>
+              <p className="text-ink-muted mt-1 text-sm">{t('auth.signInSubtitle')}</p>
             </div>
-            <IconButton label="Close" onClick={close} icon={<X className="size-5" />} />
+            <IconButton label={t('auth.close')} onClick={close} icon={<X className="size-5" />} />
           </div>
           <SignInForm onSignedIn={close} />
         </div>
@@ -67,6 +69,7 @@ export function SignInButton({ label = 'Sign in' }: { label?: string }) {
 
 function AccountMenu() {
   const dispatch = useAppDispatch();
+  const { t } = useT();
   const user = useAppSelector((state) => state.auth.user)!;
   const favoriteCount = useAppSelector(selectFavoriteCount);
   const [open, setOpen] = useState(false);
@@ -102,7 +105,7 @@ function AccountMenu() {
         type="button"
         aria-expanded={open}
         aria-controls={menuId}
-        aria-label={`Account: ${user.name}`}
+        aria-label={t('auth.account', { name: user.name })}
         onClick={() => setOpen(!open)}
         className="hover:ring-line-strong rounded-full ring-2 ring-transparent transition"
       >
@@ -122,14 +125,14 @@ function AccountMenu() {
           </div>
           <ul className="py-2">
             <MenuLink href="/profile" icon={<UserRound className="size-4" />} onClick={close}>
-              Profile
+              {t('auth.profile')}
             </MenuLink>
             <MenuLink href="/favorites" icon={<Heart className="size-4" />} onClick={close}>
-              Favorites
+              {t('nav.favorites')}
               <span className="text-ink-muted ml-auto font-mono text-xs">{favoriteCount}</span>
             </MenuLink>
             <MenuLink href="/settings" icon={<Settings className="size-4" />} onClick={close}>
-              Settings
+              {t('nav.settings')}
             </MenuLink>
           </ul>
           <button
@@ -141,7 +144,7 @@ function AccountMenu() {
             className="hover:bg-surface-sunken border-line flex w-full items-center gap-3 rounded-lg border-t px-3 py-2.5 text-sm"
           >
             <LogOut aria-hidden="true" className="size-4" />
-            Sign out
+            {t('auth.signOut')}
           </button>
         </div>
       ) : null}

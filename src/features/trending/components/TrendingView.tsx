@@ -11,29 +11,27 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { FavoriteButton } from '@/features/favorites/components/FavoriteButton';
+import { useT } from '@/i18n/useT';
 import { cn } from '@/lib/utils';
 import { useTrendingQuery } from '@/services/contentApi';
 import {
   CATEGORIES,
-  CATEGORY_LABELS,
   type ContentItem,
   type ContentSource,
   type TrendingCategory,
 } from '@/types/content';
 
-const TABS: { value: TrendingCategory; label: string }[] = [
-  { value: 'all', label: 'All' },
-  ...CATEGORIES.map((category) => ({ value: category, label: CATEGORY_LABELS[category] })),
-];
+const TABS: TrendingCategory[] = ['all', ...CATEGORIES];
 
-const COLUMNS: { source: ContentSource; title: string }[] = [
-  { source: 'news', title: 'Most read' },
-  { source: 'movie', title: 'Most watched' },
-  { source: 'social', title: 'Most shared' },
-];
+const COLUMNS = [
+  { source: 'news', titleKey: 'trending.mostRead' },
+  { source: 'movie', titleKey: 'trending.mostWatched' },
+  { source: 'social', titleKey: 'trending.mostShared' },
+] as const;
 
 export function TrendingView() {
   const [category, setCategory] = useState<TrendingCategory>('all');
+  const { t } = useT();
   const { currentData, isFetching, isError, refetch } = useTrendingQuery(category);
 
   const lists: Record<ContentSource, ContentItem[]> = {
@@ -47,9 +45,9 @@ export function TrendingView() {
   return (
     <>
       <PageHeader
-        kicker="Most popular"
-        title="Trending now"
-        description="What everyone is reading, watching and sharing, ranked by popularity."
+        kicker={t('trending.kicker')}
+        title={t('trending.title')}
+        description={t('trending.description')}
         actions={currentData ? <DataOriginBadge origins={[currentData.origins]} /> : null}
       />
 
@@ -65,8 +63,8 @@ export function TrendingView() {
       >
         {isError ? (
           <ErrorState
-            title="Trending could not load"
-            message="We could not fetch what is popular right now."
+            title={t('trending.errorTitle')}
+            message={t('trending.errorMessage')}
             onRetry={() => void refetch()}
           />
         ) : !currentData ? (
@@ -74,15 +72,15 @@ export function TrendingView() {
         ) : lists.news.length + lists.movie.length + lists.social.length === 0 ? (
           <EmptyState
             icon={<Flame className="size-6" />}
-            title="Nothing is trending here yet"
-            description="Try another category."
+            title={t('trending.emptyTitle')}
+            description={t('trending.emptyDescription')}
           />
         ) : (
           <div className="space-y-12">
             {lead ? (
               <section aria-labelledby="lead-heading">
                 <h2 id="lead-heading" className="sr-only">
-                  Top story
+                  {t('trending.topStory')}
                 </h2>
                 <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
                   <ContentCard item={lead} rank={1} priority className="animate-fade-up" />
@@ -91,7 +89,7 @@ export function TrendingView() {
               </section>
             ) : null}
             <div className="border-ink grid gap-10 border-t-2 pt-8 md:grid-cols-2 xl:grid-cols-3">
-              {COLUMNS.map(({ source, title }) => (
+              {COLUMNS.map(({ source, titleKey }) => (
                 <section key={source} aria-labelledby={`col-${source}`}>
                   <h2
                     id={`col-${source}`}
@@ -100,12 +98,12 @@ export function TrendingView() {
                       SOURCE_META[source].text,
                     )}
                   >
-                    {title}
+                    {t(titleKey)}
                   </h2>
                   {lists[source].length ? (
                     <RankedList items={lists[source]} startRank={1} source={source} />
                   ) : (
-                    <p className="text-ink-muted text-sm">Nothing here for this category.</p>
+                    <p className="text-ink-muted text-sm">{t('trending.emptyColumn')}</p>
                   )}
                 </section>
               ))}
@@ -128,6 +126,7 @@ function CategoryTabs({
   panelId: string;
 }) {
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
+  const { t } = useT();
 
   const onKeyDown = (event: KeyboardEvent, index: number) => {
     const last = TABS.length - 1;
@@ -143,32 +142,32 @@ function CategoryTabs({
               : null;
     if (next === null) return;
     event.preventDefault();
-    onChange(TABS[next]!.value);
+    onChange(TABS[next]!);
     refs.current[next]?.focus();
   };
 
   return (
     <div
       role="tablist"
-      aria-label="Trending categories"
+      aria-label={t('trending.tabsLabel')}
       className="-mx-4 flex gap-1 overflow-x-auto px-4 md:mx-0 md:px-0"
     >
       {TABS.map((tab, index) => {
-        const selected = tab.value === value;
-        const Icon = tab.value === 'all' ? Flame : CATEGORY_ICONS[tab.value];
+        const selected = tab === value;
+        const Icon = tab === 'all' ? Flame : CATEGORY_ICONS[tab];
         return (
           <button
-            key={tab.value}
+            key={tab}
             ref={(node) => {
               refs.current[index] = node;
             }}
-            id={`tab-${tab.value}`}
+            id={`tab-${tab}`}
             role="tab"
             type="button"
             aria-selected={selected}
             aria-controls={panelId}
             tabIndex={selected ? 0 : -1}
-            onClick={() => onChange(tab.value)}
+            onClick={() => onChange(tab)}
             onKeyDown={(event) => onKeyDown(event, index)}
             className={cn(
               'inline-flex h-10 shrink-0 items-center gap-2 rounded-full px-4 text-sm font-medium transition-colors',
@@ -176,7 +175,7 @@ function CategoryTabs({
             )}
           >
             <Icon aria-hidden="true" className="size-4" />
-            {tab.label}
+            {tab === 'all' ? t('trending.all') : t(`categories.${tab}`)}
           </button>
         );
       })}
@@ -194,6 +193,7 @@ function RankedList({
   startRank: number;
   source: ContentSource;
 }) {
+  const { t } = useT();
   return (
     <ol className="divide-line divide-y" start={startRank}>
       {items.map((item, index) => (
@@ -213,7 +213,8 @@ function RankedList({
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-ink-muted font-mono text-[0.6875rem] tracking-wider uppercase">
-              {CATEGORY_LABELS[item.category]} / <span className="normal-case">{item.author}</span>
+              {t(`categories.${item.category}`)} /{' '}
+              <span className="normal-case">{item.author}</span>
             </p>
             <h3 className="font-display mt-1 line-clamp-3 text-lg leading-snug font-semibold">
               <a
@@ -223,7 +224,7 @@ function RankedList({
                 className="decoration-2 underline-offset-4 hover:underline"
               >
                 {item.title}
-                <span className="sr-only"> (opens in a new tab)</span>
+                <span className="sr-only"> {t('common.opensNewTab')}</span>
                 <ArrowUpRight aria-hidden="true" className="ml-1 inline size-4 opacity-50" />
               </a>
             </h3>

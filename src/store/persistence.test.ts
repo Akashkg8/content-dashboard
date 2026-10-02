@@ -22,8 +22,14 @@ describe('loadState', () => {
       feed: { order: 'not an array' },
       auth: { user: { name: '', email: 'bad' } },
     });
+    // Saves from before the language setting existed get the default language.
     expect(loadState()).toEqual({
-      preferences: { categories: ['science'], sources: ['news'], hashtags: ['space'] },
+      preferences: {
+        categories: ['science'],
+        sources: ['news'],
+        hashtags: ['space'],
+        language: 'en',
+      },
     });
   });
 

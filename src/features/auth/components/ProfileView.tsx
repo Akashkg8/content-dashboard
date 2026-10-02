@@ -8,10 +8,10 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { selectFavoriteCount } from '@/features/favorites/selectors';
+import { useT } from '@/i18n/useT';
 import { cn } from '@/lib/utils';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { useStoreHydrated } from '@/store/useStoreHydrated';
-import { CATEGORY_LABELS } from '@/types/content';
 
 import { AVATAR_COLORS, signOut, updateProfile, type UserProfile } from '../authSlice';
 import { Avatar, AVATAR_STYLES } from './Avatar';
@@ -21,13 +21,14 @@ import { SignInButton } from './UserMenu';
 export const BIO_LIMIT = 280;
 
 export function ProfileView() {
+  const { t } = useT();
   const user = useAppSelector((state) => state.auth.user);
   const hydrated = useStoreHydrated();
 
   if (!hydrated) {
     return (
       <>
-        <PageHeader kicker="Account" title="Your profile" />
+        <PageHeader kicker={t('profile.kicker')} title={t('profile.title')} />
         <Skeleton className="h-72 w-full rounded-2xl" />
       </>
     );
@@ -36,12 +37,12 @@ export function ProfileView() {
   if (!user) {
     return (
       <>
-        <PageHeader kicker="Account" title="Your profile" />
+        <PageHeader kicker={t('profile.kicker')} title={t('profile.title')} />
         <EmptyState
           icon={<UserRound className="size-6" />}
-          title="You are browsing as a guest"
-          description="Sign in to set your name, avatar and bio. It is a demo account stored only in this browser."
-          action={<SignInButton label="Sign in to continue" />}
+          title={t('profile.guestTitle')}
+          description={t('profile.guestDescription')}
+          action={<SignInButton label={t('profile.signInToContinue')} />}
         />
       </>
     );
@@ -53,6 +54,7 @@ export function ProfileView() {
 
 function ProfileForm({ user }: { user: UserProfile }) {
   const dispatch = useAppDispatch();
+  const { t, language } = useT();
   const id = useId();
   const favoriteCount = useAppSelector(selectFavoriteCount);
   const categories = useAppSelector((state) => state.preferences.categories);
@@ -60,7 +62,7 @@ function ProfileForm({ user }: { user: UserProfile }) {
   const [name, setName] = useState(user.name);
   const [bio, setBio] = useState(user.bio);
   const [avatarColor, setAvatarColor] = useState(user.avatarColor);
-  const [error, setError] = useState('');
+  const [nameError, setNameError] = useState(false);
   const [saved, setSaved] = useState(false);
 
   const dirty = name !== user.name || bio !== user.bio || avatarColor !== user.avatarColor;
@@ -68,23 +70,27 @@ function ProfileForm({ user }: { user: UserProfile }) {
   const submit = (event: FormEvent) => {
     event.preventDefault();
     if (!name.trim()) {
-      setError('Your name cannot be empty.');
+      setNameError(true);
       return;
     }
-    setError('');
+    setNameError(false);
     dispatch(updateProfile({ name: name.trim(), bio: bio.trim(), avatarColor }));
     setSaved(true);
   };
 
-  const joined = new Date(user.joinedAt).toLocaleDateString('en', {
+  const joined = new Date(user.joinedAt).toLocaleDateString(language, {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
   });
+  const statLabel = 'text-ink-muted font-mono text-[0.6875rem] tracking-wider uppercase';
 
   return (
     <>
-      <PageHeader kicker="Account" title={`Hello, ${user.name.split(' ')[0]}`} />
+      <PageHeader
+        kicker={t('profile.kicker')}
+        title={t('profile.hello', { name: user.name.split(' ')[0] })}
+      />
       <div className="grid gap-8 lg:grid-cols-[18rem_1fr]">
         <aside className="border-line bg-surface h-fit rounded-2xl border p-6 text-center">
           <Avatar name={name || user.name} color={avatarColor} size="lg" className="mx-auto" />
@@ -93,33 +99,27 @@ function ProfileForm({ user }: { user: UserProfile }) {
           {bio ? <p className="mt-4 text-sm text-pretty">{bio}</p> : null}
           <dl className="border-line mt-6 grid grid-cols-2 gap-4 border-t pt-5 text-left">
             <div>
-              <dt className="text-ink-muted font-mono text-[0.6875rem] tracking-wider uppercase">
-                Favorites
-              </dt>
+              <dt className={statLabel}>{t('profile.favorites')}</dt>
               <dd className="font-display text-2xl font-semibold">{favoriteCount}</dd>
             </div>
             <div>
-              <dt className="text-ink-muted font-mono text-[0.6875rem] tracking-wider uppercase">
-                Topics
-              </dt>
+              <dt className={statLabel}>{t('profile.topics')}</dt>
               <dd className="font-display text-2xl font-semibold">{categories.length}</dd>
             </div>
             <div className="col-span-2">
-              <dt className="text-ink-muted font-mono text-[0.6875rem] tracking-wider uppercase">
-                Follows
-              </dt>
-              <dd className="text-sm">{categories.map((c) => CATEGORY_LABELS[c]).join(', ')}</dd>
+              <dt className={statLabel}>{t('profile.follows')}</dt>
+              <dd className="text-sm">
+                {categories.map((category) => t(`categories.${category}`)).join(', ')}
+              </dd>
             </div>
             <div className="col-span-2">
-              <dt className="text-ink-muted font-mono text-[0.6875rem] tracking-wider uppercase">
-                Member since
-              </dt>
+              <dt className={statLabel}>{t('profile.memberSince')}</dt>
               <dd className="text-sm">{joined}</dd>
             </div>
           </dl>
           <Button variant="ghost" className="mt-6 w-full" onClick={() => dispatch(signOut())}>
             <LogOut aria-hidden="true" className="size-4" />
-            Sign out
+            {t('auth.signOut')}
           </Button>
         </aside>
 
@@ -129,31 +129,39 @@ function ProfileForm({ user }: { user: UserProfile }) {
           onChange={() => setSaved(false)}
           className="border-line bg-surface space-y-6 rounded-2xl border p-6"
         >
-          <h2 className="font-display text-2xl font-semibold">Edit profile</h2>
-          <Field id={`${id}-name`} label="Display name" error={error}>
+          <h2 className="font-display text-2xl font-semibold">{t('profile.editProfile')}</h2>
+          <Field
+            id={`${id}-name`}
+            label={t('profile.displayName')}
+            error={nameError ? t('profile.nameEmpty') : undefined}
+          >
             <input
               id={`${id}-name`}
               value={name}
               maxLength={60}
               onChange={(event) => setName(event.target.value)}
-              aria-invalid={Boolean(error)}
-              aria-describedby={error ? `${id}-name-error` : undefined}
+              aria-invalid={nameError}
+              aria-describedby={nameError ? `${id}-name-error` : undefined}
               className={inputClasses}
             />
           </Field>
-          <Field id={`${id}-bio`} label="Bio" hint={`${bio.length} / ${BIO_LIMIT} characters`}>
+          <Field
+            id={`${id}-bio`}
+            label={t('profile.bio')}
+            hint={t('profile.bioHint', { count: bio.length, max: BIO_LIMIT })}
+          >
             <textarea
               id={`${id}-bio`}
               value={bio}
               maxLength={BIO_LIMIT}
               rows={4}
               onChange={(event) => setBio(event.target.value)}
-              placeholder="What do you like to read about?"
+              placeholder={t('profile.bioPlaceholder')}
               className={cn(inputClasses, 'h-auto resize-y py-3')}
             />
           </Field>
           <fieldset>
-            <legend className="mb-2 text-sm font-medium">Avatar colour</legend>
+            <legend className="mb-2 text-sm font-medium">{t('profile.avatarColour')}</legend>
             <div className="flex flex-wrap gap-3">
               {AVATAR_COLORS.map((color) => (
                 <label key={color} className="relative cursor-pointer">
@@ -173,17 +181,17 @@ function ProfileForm({ user }: { user: UserProfile }) {
                   >
                     {avatarColor === color ? <Check aria-hidden="true" className="size-4" /> : null}
                   </span>
-                  <span className="sr-only">{color}</span>
+                  <span className="sr-only">{t(`profile.colors.${color}`)}</span>
                 </label>
               ))}
             </div>
           </fieldset>
           <div className="flex items-center gap-4">
             <Button type="submit" disabled={!dirty}>
-              Save changes
+              {t('profile.save')}
             </Button>
             <p role="status" className="text-social text-sm">
-              {saved ? 'Profile saved.' : ''}
+              {saved ? t('profile.saved') : ''}
             </p>
           </div>
         </form>

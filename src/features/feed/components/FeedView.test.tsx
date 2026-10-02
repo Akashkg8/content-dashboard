@@ -137,7 +137,7 @@ describe('FeedView (integration)', () => {
     });
     renderWithStore(<FeedView />, {
       preloadedState: {
-        preferences: { categories: ['science'], sources: ['news'], hashtags: [] },
+        preferences: { categories: ['science'], sources: ['news'], hashtags: [], language: 'en' },
       },
     });
 

@@ -3,6 +3,8 @@
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
+import { useT } from '@/i18n/useT';
+
 import { IconButton } from './IconButton';
 
 /**
@@ -12,9 +14,10 @@ import { IconButton } from './IconButton';
  */
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
+  const { t } = useT();
   return (
     <IconButton
-      label="Toggle dark mode"
+      label={t('common.toggleTheme')}
       onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
       icon={
         <>

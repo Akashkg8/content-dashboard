@@ -13,24 +13,10 @@ export const CATEGORIES = [
   'science',
 ] as const;
 export type Category = (typeof CATEGORIES)[number];
-
-export const CATEGORY_LABELS: Record<Category, string> = {
-  technology: 'Technology',
-  business: 'Finance',
-  sports: 'Sports',
-  entertainment: 'Entertainment',
-  health: 'Health',
-  science: 'Science',
-};
+/** Display names live in the translation files (src/i18n/locales). */
 
 export const SOURCES = ['news', 'movie', 'social'] as const;
 export type ContentSource = (typeof SOURCES)[number];
-
-export const SOURCE_LABELS: Record<ContentSource, string> = {
-  news: 'News',
-  movie: 'Movies',
-  social: 'Posts',
-};
 
 /** Where the data actually came from. Surfaced in the UI as a "Demo data" badge. */
 export type DataOrigin = 'live' | 'mock';

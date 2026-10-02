@@ -3,6 +3,7 @@
 import { useId, useState, type FormEvent } from 'react';
 
 import { Button } from '@/components/ui/Button';
+import { useT } from '@/i18n/useT';
 import { cn } from '@/lib/utils';
 import { useAppDispatch } from '@/store/hooks';
 
@@ -19,16 +20,17 @@ export const inputClasses =
  */
 export function SignInForm({ onSignedIn }: { onSignedIn?: () => void }) {
   const dispatch = useAppDispatch();
+  const { t } = useT();
   const id = useId();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [errors, setErrors] = useState<{ name?: string; email?: string }>({});
+  const [errors, setErrors] = useState<{ name?: boolean; email?: boolean }>({});
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
     const next = {
-      name: name.trim() ? undefined : 'Enter your name.',
-      email: EMAIL_PATTERN.test(email.trim()) ? undefined : 'Enter an email like you@example.com.',
+      name: !name.trim(),
+      email: !EMAIL_PATTERN.test(email.trim()),
     };
     setErrors(next);
     if (next.name || next.email) return;
@@ -38,7 +40,11 @@ export function SignInForm({ onSignedIn }: { onSignedIn?: () => void }) {
 
   return (
     <form onSubmit={submit} noValidate className="space-y-4">
-      <Field id={`${id}-name`} label="Name" error={errors.name}>
+      <Field
+        id={`${id}-name`}
+        label={t('auth.name')}
+        error={errors.name ? t('auth.nameRequired') : undefined}
+      >
         <input
           id={`${id}-name`}
           value={name}
@@ -50,7 +56,11 @@ export function SignInForm({ onSignedIn }: { onSignedIn?: () => void }) {
           className={inputClasses}
         />
       </Field>
-      <Field id={`${id}-email`} label="Email" error={errors.email}>
+      <Field
+        id={`${id}-email`}
+        label={t('auth.email')}
+        error={errors.email ? t('auth.emailInvalid') : undefined}
+      >
         <input
           id={`${id}-email`}
           type="email"
@@ -62,11 +72,9 @@ export function SignInForm({ onSignedIn }: { onSignedIn?: () => void }) {
           className={inputClasses}
         />
       </Field>
-      <p className="text-ink-muted text-xs">
-        Demo sign-in. No password needed, and nothing leaves your browser.
-      </p>
+      <p className="text-ink-muted text-xs">{t('auth.demoNote')}</p>
       <Button type="submit" className="w-full">
-        Sign in
+        {t('auth.signIn')}
       </Button>
     </form>
   );

@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 
 import { useDebounce } from '@/hooks/useDebounce';
+import { useT } from '@/i18n/useT';
 
 export const SEARCH_DEBOUNCE_MS = 400;
 export const MIN_QUERY_LENGTH = 2;
@@ -26,6 +27,7 @@ export function SearchBar({
   shortcut?: boolean;
 }) {
   const router = useRouter();
+  const { t } = useT();
   const pathname = usePathname();
   const urlQuery = useSearchParams().get('q') ?? '';
   const inputRef = useRef<HTMLInputElement>(null);
@@ -76,7 +78,7 @@ export function SearchBar({
   return (
     <form role="search" onSubmit={onSubmit} className="relative w-full max-w-md">
       <label htmlFor={inputId} className="sr-only">
-        Search news, movies and posts
+        {t('search.label')}
       </label>
       <Search
         aria-hidden="true"
@@ -96,14 +98,14 @@ export function SearchBar({
             setValue('');
           }
         }}
-        placeholder="Search news, movies, posts"
+        placeholder={t('search.placeholder')}
         aria-keyshortcuts={shortcut ? '/' : undefined}
         className="border-line bg-surface placeholder:text-ink-muted/80 focus:border-accent h-10 w-full rounded-full border pr-10 pl-10 text-sm transition-colors outline-none focus-visible:outline-none [&::-webkit-search-cancel-button]:hidden"
       />
       {value ? (
         <button
           type="button"
-          aria-label="Clear search"
+          aria-label={t('search.clear')}
           onClick={() => {
             setValue('');
             inputRef.current?.focus();

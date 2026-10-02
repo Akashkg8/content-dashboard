@@ -1,7 +1,8 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { ErrorState } from './ErrorState';
+import { renderWithStore as render } from '../../../tests/utils/renderWithStore';
 
 describe('ErrorState', () => {
   it('is announced as an alert and retries on click', async () => {

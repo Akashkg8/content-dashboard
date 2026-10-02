@@ -1,5 +1,6 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
+import type { Language } from '@/i18n';
 import { normalizeHashtag } from '@/lib/hashtags';
 import { hydrated } from '@/store/actions';
 import { CATEGORIES, SOURCES, type Category, type ContentSource } from '@/types/content';
@@ -9,6 +10,8 @@ export interface PreferencesState {
   sources: ContentSource[];
   /** Followed hashtags, lower-case, without `#`. Matching posts join the feed. */
   hashtags: string[];
+  /** Interface language. Content stays in the language it was published in. */
+  language: Language;
 }
 
 export const MAX_HASHTAGS = 10;
@@ -17,6 +20,7 @@ export const initialPreferences: PreferencesState = {
   categories: ['technology', 'business', 'sports', 'entertainment'],
   sources: [...SOURCES],
   hashtags: ['webdev', 'space'],
+  language: 'en',
 };
 
 /** Keep the canonical order so cache keys stay stable no matter the click order. */
@@ -56,15 +60,28 @@ const preferencesSlice = createSlice({
     removeHashtag(state, action: PayloadAction<string>) {
       state.hashtags = state.hashtags.filter((tag) => tag !== action.payload);
     },
-    resetPreferences: () => initialPreferences,
+    setLanguage(state, action: PayloadAction<Language>) {
+      state.language = action.payload;
+    },
+    /** Resets content choices. The language is a display setting, so it is kept. */
+    resetPreferences: (state) => ({ ...initialPreferences, language: state.language }),
   },
   extraReducers: (builder) => {
-    builder.addCase(hydrated, (state, action) => action.payload.preferences ?? state);
+    // Saves from before the language setting existed lack the field.
+    builder.addCase(hydrated, (state, action) =>
+      action.payload.preferences ? { ...state, ...action.payload.preferences } : state,
+    );
   },
 });
 
 export { normalizeHashtag };
 
-export const { toggleCategory, toggleSource, addHashtag, removeHashtag, resetPreferences } =
-  preferencesSlice.actions;
+export const {
+  toggleCategory,
+  toggleSource,
+  addHashtag,
+  removeHashtag,
+  setLanguage,
+  resetPreferences,
+} = preferencesSlice.actions;
 export const preferencesReducer = preferencesSlice.reducer;

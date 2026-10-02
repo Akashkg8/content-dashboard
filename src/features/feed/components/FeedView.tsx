@@ -14,6 +14,7 @@ import { ChipGroup, type ChipOption } from '@/components/ui/ChipGroup';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { useT } from '@/i18n/useT';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import type { ContentSource } from '@/types/content';
 
@@ -25,6 +26,7 @@ type Filter = 'all' | ContentSource;
 
 export function FeedView() {
   const dispatch = useAppDispatch();
+  const { t } = useT();
   const feed = useUnifiedFeed();
   const hasCustomOrder = useAppSelector((state) => state.feed.order.length > 0);
   const [filter, setFilter] = useState<Filter>('all');
@@ -35,12 +37,12 @@ export function FeedView() {
     activeFilter === 'all' ? feed.items : feed.items.filter((item) => item.source === activeFilter);
 
   const filterOptions: ChipOption<Filter>[] = [
-    { value: 'all', label: 'Everything', count: feed.items.length },
+    { value: 'all', label: t('feed.everything'), count: feed.items.length },
     ...feed.enabledSources.map((source) => {
       const meta = SOURCE_META[source];
       return {
         value: source,
-        label: meta.plural,
+        label: t(meta.pluralKey),
         icon: <meta.icon aria-hidden="true" className="size-3.5" />,
         count: feed.items.filter((item) => item.source === source).length,
       };
@@ -50,9 +52,9 @@ export function FeedView() {
   return (
     <>
       <PageHeader
-        kicker="Today's edition"
-        title="Your feed"
-        description="Headlines, movie picks and posts from the topics you follow. Drag the grip on any card to rearrange your edition."
+        kicker={t('feed.kicker')}
+        title={t('feed.title')}
+        description={t('feed.description')}
         actions={
           <>
             <DataOriginBadge origins={feed.origins} />
@@ -65,7 +67,7 @@ export function FeedView() {
 
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <ChipGroup
-          label="Filter by source"
+          label={t('feed.filterLabel')}
           options={filterOptions}
           value={activeFilter}
           onChange={setFilter}
@@ -74,12 +76,12 @@ export function FeedView() {
           {hasCustomOrder ? (
             <Button variant="ghost" size="sm" onClick={() => dispatch(resetFeedOrder())}>
               <RotateCcw aria-hidden="true" className="size-3.5" />
-              Reset order
+              {t('feed.resetOrder')}
             </Button>
           ) : null}
           <Link href="/settings" className={buttonClasses({ variant: 'ghost', size: 'sm' })}>
             <SlidersHorizontal aria-hidden="true" className="size-3.5" />
-            Personalize
+            {t('feed.personalize')}
           </Link>
         </div>
       </div>
@@ -90,11 +92,14 @@ export function FeedView() {
           className="border-danger/40 bg-surface mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm"
         >
           <span>
-            {feed.failedSources.map((source) => SOURCE_META[source].plural).join(' and ')} could not
-            load. The rest of your feed is below.
+            {t('feed.partialError', {
+              sources: feed.failedSources
+                .map((source) => t(SOURCE_META[source].pluralKey))
+                .join(t('common.and')),
+            })}
           </span>
           <Button size="sm" variant="secondary" onClick={feed.retry}>
-            Try again
+            {t('common.tryAgain')}
           </Button>
         </div>
       ) : null}
@@ -103,18 +108,18 @@ export function FeedView() {
         <CardGridSkeleton />
       ) : feed.isError ? (
         <ErrorState
-          title="Your feed could not load"
-          message="We could not reach any of your sources. Check your connection and try again."
+          title={t('feed.errorTitle')}
+          message={t('feed.errorMessage')}
           onRetry={feed.retry}
         />
       ) : visible.length === 0 ? (
         <EmptyState
           icon={<Newspaper className="size-6" />}
-          title="Nothing here yet"
-          description="Try following more categories or hashtags to fill your edition."
+          title={t('feed.emptyTitle')}
+          description={t('feed.emptyDescription')}
           action={
             <Link href="/settings" className={buttonClasses()}>
-              Choose topics
+              {t('feed.chooseTopics')}
             </Link>
           }
         />
@@ -122,7 +127,7 @@ export function FeedView() {
         <>
           <SortableGrid
             items={visible}
-            label="Your feed"
+            label={t('feed.listLabel')}
             onReorder={(activeId, overId) =>
               dispatch(reorderFeed({ ids: feed.items.map((item) => item.id), activeId, overId }))
             }

@@ -1,4 +1,7 @@
+'use client';
+
 import { Badge } from '@/components/ui/Badge';
+import { useT } from '@/i18n/useT';
 import type { ContentSource, DataOrigin } from '@/types/content';
 
 import { SOURCE_META } from './sourceStyles';
@@ -11,18 +14,18 @@ type Origins = Partial<Record<ContentSource, DataOrigin>>;
  * always sample data by design, so they never trigger the badge.
  */
 export function DataOriginBadge({ origins }: { origins: readonly Origins[] }) {
+  const { t } = useT();
   const mocked = (['news', 'movie'] as const).filter((source) =>
     origins.some((origin) => origin[source] === 'mock'),
   );
   if (mocked.length === 0) return null;
-  const names = mocked.map((source) => SOURCE_META[source].plural.toLowerCase()).join(' and ');
+  const names = mocked
+    .map((source) => t(SOURCE_META[source].pluralKey).toLowerCase())
+    .join(t('common.and'));
   return (
-    <Badge
-      tone="neutral"
-      title={`Showing built-in sample ${names} because no API key is set or the provider is unavailable.`}
-    >
-      Demo data
-      <span className="sr-only">: showing sample {names}</span>
+    <Badge tone="neutral" title={t('common.demoTitle', { names })}>
+      {t('common.demoData')}
+      <span className="sr-only">{t('common.demoSr', { names })}</span>
     </Badge>
   );
 }

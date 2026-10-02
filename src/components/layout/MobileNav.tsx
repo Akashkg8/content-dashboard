@@ -4,6 +4,7 @@ import { Menu, X } from 'lucide-react';
 import { useRef } from 'react';
 
 import { IconButton } from '@/components/ui/IconButton';
+import { useT } from '@/i18n/useT';
 
 import { Brand } from './Brand';
 import { NavLinks } from './NavLinks';
@@ -15,6 +16,7 @@ import { NavLinks } from './NavLinks';
  */
 export function MobileNav() {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const { t } = useT();
 
   const open = () => dialogRef.current?.showModal();
   const close = () => dialogRef.current?.close();
@@ -22,7 +24,7 @@ export function MobileNav() {
   return (
     <>
       <IconButton
-        label="Open menu"
+        label={t('common.openMenu')}
         aria-haspopup="dialog"
         onClick={open}
         className="md:hidden"
@@ -30,7 +32,7 @@ export function MobileNav() {
       />
       <dialog
         ref={dialogRef}
-        aria-label="Menu"
+        aria-label={t('common.menu')}
         // Clicking the backdrop lands on the dialog element itself, not its content.
         onClick={(event) => {
           if (event.target === event.currentTarget) close();
@@ -40,9 +42,13 @@ export function MobileNav() {
         <div className="flex h-full flex-col px-4 py-5">
           <div className="flex items-center justify-between">
             <Brand className="px-3" />
-            <IconButton label="Close menu" onClick={close} icon={<X className="size-5" />} />
+            <IconButton
+              label={t('common.closeMenu')}
+              onClick={close}
+              icon={<X className="size-5" />}
+            />
           </div>
-          <nav aria-label="Main" className="mt-8">
+          <nav aria-label={t('nav.main')} className="mt-8">
             <NavLinks onNavigate={close} />
           </nav>
         </div>

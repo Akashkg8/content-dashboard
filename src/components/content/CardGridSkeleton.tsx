@@ -1,11 +1,15 @@
+'use client';
+
 import { Skeleton } from '@/components/ui/Skeleton';
+import { useT } from '@/i18n/useT';
 
 /** Placeholder grid shown while a section loads. Matches the content card layout. */
 export function CardGridSkeleton({ count = 6 }: { count?: number }) {
+  const { t } = useT();
   return (
     <div
       aria-busy="true"
-      aria-label="Loading content"
+      aria-label={t('common.loadingContent')}
       className="grid gap-6 md:grid-cols-2 xl:grid-cols-3"
     >
       {Array.from({ length: count }, (_, index) => (

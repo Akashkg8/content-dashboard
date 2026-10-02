@@ -24,6 +24,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
+import { useT } from '@/i18n/useT';
 import { cn } from '@/lib/utils';
 import type { ContentItem } from '@/types/content';
 
@@ -44,6 +45,7 @@ export interface SortableGridProps {
  */
 export function SortableGrid({ items, label, onReorder }: SortableGridProps) {
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
+  const { t } = useT();
   const ids = useMemo(() => items.map((item) => item.id), [items]);
   const byId = useMemo(() => new Map(items.map((item) => [item.id, item])), [items]);
 
@@ -55,21 +57,22 @@ export function SortableGrid({ items, label, onReorder }: SortableGridProps) {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
-  const titleOf = (id: UniqueIdentifier) => byId.get(String(id))?.title ?? 'card';
+  const titleOf = (id: UniqueIdentifier) => byId.get(String(id))?.title ?? t('dnd.card');
   const positionOf = (id: UniqueIdentifier) => ids.indexOf(String(id)) + 1;
 
+  const total = ids.length;
   const announcements: Announcements = {
     onDragStart: ({ active }) =>
-      `Picked up ${titleOf(active.id)}. It is at position ${positionOf(active.id)} of ${ids.length}.`,
+      t('dnd.pickedUp', { title: titleOf(active.id), position: positionOf(active.id), total }),
     onDragOver: ({ active, over }) =>
       over
-        ? `${titleOf(active.id)} moved to position ${positionOf(over.id)} of ${ids.length}.`
-        : `${titleOf(active.id)} is no longer over a drop position.`,
+        ? t('dnd.movedTo', { title: titleOf(active.id), position: positionOf(over.id), total })
+        : t('dnd.notOver', { title: titleOf(active.id) }),
     onDragEnd: ({ active, over }) =>
       over
-        ? `Dropped ${titleOf(active.id)} at position ${positionOf(over.id)} of ${ids.length}.`
-        : `Dropped ${titleOf(active.id)}. Order unchanged.`,
-    onDragCancel: ({ active }) => `Cancelled. ${titleOf(active.id)} returned to its place.`,
+        ? t('dnd.dropped', { title: titleOf(active.id), position: positionOf(over.id), total })
+        : t('dnd.droppedUnchanged', { title: titleOf(active.id) }),
+    onDragCancel: ({ active }) => t('dnd.cancelled', { title: titleOf(active.id) }),
   };
 
   const handleDragEnd = ({ active, over }: DragEndEvent) => {
@@ -87,8 +90,7 @@ export function SortableGrid({ items, label, onReorder }: SortableGridProps) {
       accessibility={{
         announcements,
         screenReaderInstructions: {
-          draggable:
-            'To reorder, press Space or Enter to pick up this card. Use the arrow keys to move it, then press Space or Enter to drop it, or Escape to cancel.',
+          draggable: t('dnd.instructions'),
         },
       }}
       onDragStart={({ active }: DragStartEvent) => setActiveId(active.id)}
@@ -107,7 +109,12 @@ export function SortableGrid({ items, label, onReorder }: SortableGridProps) {
           <ContentCard
             item={activeItem}
             className="shadow-lift rotate-[1.5deg] cursor-grabbing"
-            handle={<GripButton title={activeItem.title} />}
+            handle={
+              <GripButton
+                reorderLabel={t('common.reorder', { title: activeItem.title })}
+                dragTitle={t('common.dragToReorder')}
+              />
+            }
           />
         ) : null}
       </DragOverlay>
@@ -116,6 +123,7 @@ export function SortableGrid({ items, label, onReorder }: SortableGridProps) {
 }
 
 function SortableCard({ item, index }: { item: ContentItem; index: number }) {
+  const { t } = useT();
   const {
     attributes,
     listeners,
@@ -141,7 +149,8 @@ function SortableCard({ item, index }: { item: ContentItem; index: number }) {
           handle={
             <GripButton
               ref={setActivatorNodeRef}
-              title={item.title}
+              reorderLabel={t('common.reorder', { title: item.title })}
+              dragTitle={t('common.dragToReorder')}
               {...attributes}
               {...listeners}
             />
@@ -152,15 +161,18 @@ function SortableCard({ item, index }: { item: ContentItem; index: number }) {
   );
 }
 
-type GripButtonProps = React.ComponentPropsWithRef<'button'> & { title: string };
+type GripButtonProps = React.ComponentPropsWithRef<'button'> & {
+  reorderLabel: string;
+  dragTitle: string;
+};
 
-function GripButton({ title, className, ...props }: GripButtonProps) {
+function GripButton({ reorderLabel, dragTitle, className, ...props }: GripButtonProps) {
   return (
     <button
       type="button"
       {...props}
-      aria-label={`Reorder: ${title}`}
-      title="Drag to reorder"
+      aria-label={reorderLabel}
+      title={dragTitle}
       className={cn(
         'text-ink-muted hover:bg-surface-sunken hover:text-ink inline-flex size-9 shrink-0 cursor-grab touch-none items-center justify-center rounded-full',
         'active:cursor-grabbing',

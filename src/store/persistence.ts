@@ -15,10 +15,12 @@ import {
   addHashtag,
   removeHashtag,
   resetPreferences,
+  setLanguage,
   toggleCategory,
   toggleSource,
 } from '@/features/preferences/preferencesSlice';
 import type { PreferencesState } from '@/features/preferences/preferencesSlice';
+import { LANGUAGES } from '@/i18n';
 import { contentItemSchema } from '@/lib/schemas';
 import { CATEGORIES, SOURCES } from '@/types/content';
 
@@ -41,6 +43,7 @@ const sliceSchemas = {
     categories: z.array(z.enum(CATEGORIES)).min(1),
     sources: z.array(z.enum(SOURCES)).min(1),
     hashtags: z.array(z.string().regex(/^[a-z0-9_]{1,30}$/)).max(10),
+    language: z.enum(LANGUAGES).default('en'),
   }),
   favorites: z
     .object({ ids: z.array(z.string()), items: z.record(z.string(), contentItemSchema) })
@@ -107,6 +110,7 @@ const persistedActions = isAnyOf(
   addHashtag,
   removeHashtag,
   resetPreferences,
+  setLanguage,
   toggleFavorite,
   reorderFavorites,
   clearFavorites,

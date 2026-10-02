@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 
 import { ErrorState } from '@/components/ui/ErrorState';
+import { useT } from '@/i18n/useT';
 
 /** Error boundary for every route below the root layout. */
 export default function RouteError({
@@ -12,14 +13,15 @@ export default function RouteError({
   error: Error & { digest?: string };
   retry: () => void;
 }) {
+  const { t } = useT();
   useEffect(() => {
     console.error(error);
   }, [error]);
 
   return (
     <ErrorState
-      title="This page hit a snag"
-      message="Something went wrong while loading this page. Your preferences and favorites are safe."
+      title={t('pages.routeErrorTitle')}
+      message={t('pages.routeErrorMessage')}
       onRetry={retry}
     />
   );

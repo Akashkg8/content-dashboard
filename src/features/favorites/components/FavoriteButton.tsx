@@ -3,6 +3,7 @@
 import { Heart } from 'lucide-react';
 import { motion } from 'motion/react';
 
+import { useT } from '@/i18n/useT';
 import { cn } from '@/lib/utils';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import type { ContentItem } from '@/types/content';
@@ -16,14 +17,15 @@ import { selectIsFavorite } from '../selectors';
  */
 export function FavoriteButton({ item, className }: { item: ContentItem; className?: string }) {
   const dispatch = useAppDispatch();
+  const { t } = useT();
   const isFavorite = useAppSelector((state) => selectIsFavorite(state, item.id));
 
   return (
     <button
       type="button"
       aria-pressed={isFavorite}
-      aria-label={`Favorite: ${item.title}`}
-      title={isFavorite ? 'Remove from favorites' : 'Save to favorites'}
+      aria-label={t('common.favorite', { title: item.title })}
+      title={isFavorite ? t('common.removeFavorite') : t('common.saveFavorite')}
       onClick={() => dispatch(toggleFavorite(item))}
       className={cn(
         'bg-surface/90 inline-flex size-10 items-center justify-center rounded-full backdrop-blur',
