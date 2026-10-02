@@ -7,7 +7,7 @@ dragging, save favorites, search everything at once, and watch new posts arrive 
 Built with Next.js 16, React 19, TypeScript, Redux Toolkit with RTK Query, and Tailwind CSS v4.
 
 - **Live demo:** https://content-dashboard-three-omega.vercel.app
-- **Demo video:** _add the link here after recording_ (script in [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md))
+- **Demo video:** _add the link here after recording_
 
 ## Features
 
